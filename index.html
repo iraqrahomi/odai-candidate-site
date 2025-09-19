@@ -1,277 +1,182 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>المرشح عَدّي محمد المعجل — الموقع الرسمي للحملة</title>
-  <meta name="description" content="الموقع الرسمي للحملة الانتخابية للمرشح عَدّي محمد المعجل — السيرة، البرنامج، الفعاليات، والمكاتب وقنوات التواصل." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <meta property="og:image" content="assets/candidate-portrait.jpg">
-
-  <style>
-    /* Reset خفيف + خط */
-    :root{
-      --accent:#0a6b3f;--accent-dark:#07492a;--accent-weak:#e7f3ec;
-      --bg:#f5f7f6;--card:#fff;--text:#151a16;--muted:#647067;--shadow:0 10px 28px rgba(0,0,0,.06);
-      --radius:16px;--maxw:1100px;
-      font-family:"Noto Kufi Arabic",system-ui,sans-serif;
-    }
-    *,*::before,*::after{box-sizing:border-box}
-    html,body{margin:0;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-    img{max-width:100%;display:block}
-    a{color:inherit}
-    :focus-visible{outline:3px solid rgba(10,107,63,.35);outline-offset:3px}
-    @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
-
-    /* غلاف عام */
-    .wrap{max-width:var(--maxw);margin-inline:auto;padding:clamp(12px,2.5vw,20px)}
-    header{
-      position:sticky;top:0;z-index:50;background:#fff;border:1px solid #ebeeec;border-radius:20px;
-      padding:10px 14px;box-shadow:var(--shadow);margin-bottom:14px
-    }
-    .brand{display:flex;align-items:center;gap:10px}
-    .logo{inline-size:44px;block-size:44px;border-radius:12px;display:grid;place-items:center;
-      background:linear-gradient(135deg,#caa24a,#e8d078);font-weight:800}
-    .brand h1{margin:0;font-size:clamp(18px,4vw,22px)}
-    .brand small{color:var(--muted);display:block;margin-top:2px}
-
-    /* تنقل — شريط سفلي بالموبايل */
-    .topnav{display:none}
-    .bottomnav{
-      position:sticky;bottom:0;inset-inline:0;background:#fff;border:1px solid #ebeeec;border-radius:20px;
-      padding:8px;box-shadow:var(--shadow);margin-top:10px
-    }
-    .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-    .tab{display:grid;place-items:center;height:48px;border-radius:12px;font-weight:700;background:var(--bg);color:#2e3831;text-decoration:none}
-    .tab[aria-current="page"],.tab:hover{background:var(--accent-weak);color:var(--accent)}
-
-    /* هيرو */
-    .hero{display:grid;gap:14px}
-    .card{background:var(--card);border:1px solid #ebeeec;border-radius:20px;padding:16px;box-shadow:var(--shadow)}
-    .hero-title{font-size:clamp(22px,6vw,30px);margin:0 0 6px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));
-      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-    .lead{color:var(--muted);margin:0 0 10px;font-size:clamp(14px,3.6vw,16px);line-height:1.8}
-    .btns{display:flex;gap:8px;flex-wrap:wrap}
-    .btn{display:inline-block;padding:12px 14px;border-radius:12px;font-weight:800;text-decoration:none}
-    .btn.primary{background:var(--accent);color:#fff}
-    .btn.ghost{border:2px solid var(--accent);color:var(--accent);background:transparent}
-
-    .profile{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
-    .portrait{border-radius:16px;border:4px solid #fff;box-shadow:var(--shadow)}
-    .badge{background:var(--accent-weak);color:var(--accent);padding:10px;border-radius:12px;text-align:center;font-weight:700}
-
-    /* العناوين والأقسام */
-    section{margin-block:18px}
-    section h2{text-align:center;font-size:clamp(18px,5.5vw,24px);margin:0 0 12px}
-
-    /* الشبكة */
-    .grid3{display:grid;grid-template-columns:1fr;gap:10px}
-    @media (min-width:720px){.hero{grid-template-columns:1.15fr .85fr}.grid3{grid-template-columns:repeat(3,1fr)}header{padding:12px 18px}}
-    .program-card{padding:14px}
-    .program-card h3{margin:0 0 8px;color:var(--accent);font-size:clamp(16px,4.5vw,18px)}
-    .program{list-style:none;margin:0;padding:0}
-    .program li{background:var(--accent-weak);border-inline-start:4px solid var(--accent);padding:10px;border-radius:12px;margin:8px 0}
-
-    /* الفعاليات */
-    .events .event{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:12px 0;border-bottom:1px solid #edf0ee}
-    .event:last-child{border-bottom:none}
-    .date{inline-size:72px;background:var(--accent-weak);border-radius:12px;text-align:center;padding:10px}
-    .date .d{font-weight:800;font-size:20px}
-    .date .m{color:var(--muted);font-size:12px}
-
-    /* تواصل */
-    .form-row{display:grid;gap:8px}
-    @media(min-width:720px){.form-row{grid-template-columns:1fr 1fr}}
-    input,textarea,select{width:100%;padding:14px;border:2px solid #e9ecea;border-radius:12px;font:inherit}
-    input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(10,107,63,.12);outline:0}
-    .social{display:flex;gap:10px;justify-content:center;margin-top:10px}
-    .social a{width:48px;height:48px;display:grid;place-items:center;border-radius:12px;background:var(--accent);color:#fff;text-decoration:none}
-
-    footer{color:var(--muted);text-align:center;margin:24px 0}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>المرشح عَدّي محمد المعجل — الموقع الرسمي للحملة</title>
+<meta name="description" content="الموقع الرسمي للحملة الانتخابية للمرشح عَدّي محمد المعجل — السيرة الذاتية، البرنامج الانتخابي، الفعاليات، المكاتب وقنوات التواصل.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+ --accent:#0a6b3f;--accent-dark:#07492a;--accent-weak:#e7f3ec;
+ --bg:#f5f7f6;--card:#fff;--text:#151a16;--muted:#647067;
+ --radius:16px;--maxw:1100px;
+ font-family:"Noto Kufi Arabic",system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:var(--maxw);margin:auto;padding:clamp(12px,2.5vw,20px)}
+header{background:#fff;border-radius:20px;border:1px solid #e6e8e7;
+ padding:12px 18px;display:flex;gap:16px;align-items:center;justify-content:space-between;
+ position:sticky;top:0;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.05)}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{inline-size:50px;block-size:50px;border-radius:14px;
+ background:linear-gradient(135deg,#caa24a,#e8d078);display:grid;place-items:center;font-weight:800}
+nav{display:flex;gap:10px;flex-wrap:wrap}
+nav a{padding:10px 14px;border-radius:10px;color:var(--muted);font-weight:700}
+nav a:hover{background:var(--accent-weak);color:var(--accent)}
+.hero{display:grid;gap:20px}
+.card{background:var(--card);border-radius:var(--radius);border:1px solid #e6e8e7;
+ padding:20px;box-shadow:0 8px 24px rgba(0,0,0,.05)}
+.hero-title{margin:0;font-size:clamp(22px,5.5vw,30px);
+ background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+ -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lead{color:var(--muted);line-height:1.8}
+.btn{display:inline-block;padding:12px 18px;border-radius:12px;font-weight:800}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.ghost{border:2px solid var(--accent);color:var(--accent)}
+section{margin:40px 0}
+section h2{text-align:center;font-size:clamp(20px,5vw,26px);margin-bottom:20px}
+.grid3{display:grid;gap:16px}
+@media(min-width:720px){.hero{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:repeat(3,1fr)}}
+.portrait{border-radius:16px;border:4px solid #fff;box-shadow:0 12px 32px rgba(0,0,0,.08)}
+.program-card h3{margin-top:0;color:var(--accent)}
+ul.program{list-style:none;padding:0;margin:0}
+ul.program li{background:var(--accent-weak);border-inline-start:4px solid var(--accent);padding:10px;border-radius:12px;margin:6px 0}
+footer{color:var(--muted);text-align:center;margin-top:40px}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="logo">ع</div>
-        <div>
-          <h1 class="sr-only">المرشح عَدّي محمد المعجل</h1>
-          <div class="brand-title" style="font-weight:800">المرشح عَدّي محمد المعجل</div>
-          <small>الحملة الانتخابية — خدمة الأنبار بشفافية ومسؤولية</small>
-        </div>
-      </div>
-      <!-- شريط علوي لسطح المكتب فقط -->
-      <nav class="topnav" aria-label="التنقل الرئيسي"></nav>
-    </header>
+<div class="wrap">
 
-    <!-- HERO -->
-    <div class="hero">
-      <div class="card">
-        <h2 class="hero-title">عَدّي محمد المعجل</h2>
-        <p class="lead">مرشح لعضوية مجلس النواب العراقي. رؤيتنا: تعليم فعّال، بنية تحتية عملية، وفرص حقيقية للشباب. الحملة ملتزمة بالانضباط والشفافية واحترام القانون.</p>
-        <div class="btns">
-          <a class="btn primary" href="#program">البرنامج الانتخابي</a>
-          <a class="btn ghost" href="#contact">انضم للحملة / تواصل</a>
-        </div>
-        <section id="about" style="margin-top:12px">
-          <h2 style="text-align:right">عن المرشح</h2>
-          <p class="lead" style="margin:0">ناشط مجتمعي يركّز على الحلول الواقعية في التعليم والبنى التحتية وتمكين الشباب، عبر عمل ميداني ولقاءات مباشرة مع الأهالي.</p>
-        </section>
-      </div>
-
-      <aside class="profile">
-        <img class="portrait" src="assets/candidate-portrait.jpg" alt="صورة رسمية للمرشح عَدّي محمد المعجل أمام العلم العراقي" loading="lazy">
-        <div class="badge">مرشح لعضوية مجلس النواب</div>
-      </aside>
+<header>
+  <div class="brand">
+    <div class="logo">ع</div>
+    <div>
+      <strong>المرشح عَدّي محمد المعجل</strong><br>
+      <small class="muted">الحملة الانتخابية — خدمة الأنبار بشفافية ومسؤولية</small>
     </div>
-
-    <!-- البرنامج -->
-    <section id="program">
-      <h2>البرنامج الانتخابي</h2>
-      <div class="grid3">
-        <article class="card program-card">
-          <h3>🎓 التعليم أولاً</h3>
-          <ul class="program">
-            <li>تحديث المناهج وربطها بسوق العمل</li>
-            <li>تجهيز المختبرات وتدريب المعلمين رقمياً</li>
-            <li>منح للمتفوّقين وأنشطة مدرسية</li>
-          </ul>
-        </article>
-        <article class="card program-card">
-          <h3>🏗️ بنية تحتية عملية</h3>
-          <ul class="program">
-            <li>صيانة الطرق وخدمات الأحياء</li>
-            <li>استقرار الكهرباء والمياه بحلول مرحلية</li>
-            <li>تحسين الإنترنت والاتصالات</li>
-          </ul>
-        </article>
-        <article class="card program-card">
-          <h3>👥 تمكين الشباب</h3>
-          <ul class="program">
-            <li>تدريب مهني وتقني مع فرص توظيف</li>
-            <li>قروض صغيرة للمشاريع الناشئة</li>
-            <li>حاضنات ابتكار ومراكز ريادة</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <!-- الفعاليات -->
-    <section id="events">
-      <h2>الفعاليات القادمة</h2>
-      <div class="card events">
-        <div class="event">
-          <div class="date"><div class="d">15</div><div class="m">كانون الأول</div></div>
-          <div><strong>لقاء مفتوح مع الشباب</strong><p class="lead">مركز الشباب الثقافي — 6:00 مساءً.</p></div>
-        </div>
-        <div class="event">
-          <div class="date"><div class="d">18</div><div class="m">كانون الأول</div></div>
-          <div><strong>جولة ميدانية</strong><p class="lead">زيارة للأحياء والاستماع للمقترحات — 9:00 صباحاً.</p></div>
-        </div>
-        <div class="event">
-          <div class="date"><div class="d">22</div><div class="m">كانون الأول</div></div>
-          <div><strong>ندوة التنمية المحلية</strong><p class="lead">قاعة المؤتمرات — 4:00 عصراً.</p></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- المكاتب -->
-    <section id="offices">
-      <h2>المكاتب الرسمية للحملة</h2>
-      <div class="grid3">
-        <a class="card program-card" href="https://www.facebook.com/Oday.M.J/" target="_blank" rel="noopener">
-          <h3>📢 المكتب الإعلامي الرسمي</h3><p class="lead">الأخبار والبيانات الرسمية للحملة.</p>
-        </a>
-        <a class="card program-card" href="https://www.facebook.com/profile.php?id=61581051510619" target="_blank" rel="noopener">
-          <h3>🏢 مكتب منطقة 8 شباط</h3><p class="lead">استقبال المراجعين وتنسيق المبادرات.</p>
-        </a>
-        <a class="card program-card" href="https://www.facebook.com/profile.php?id=100063876993331" target="_blank" rel="noopener">
-          <h3>🏟️ مكتب منطقة الملعب</h3><p class="lead">خدمة أهالي منطقة الملعب والمجاورين.</p>
-        </a>
-      </div>
-    </section>
-
-    <!-- المتطوعون -->
-    <section id="volunteers">
-      <h2>انضم للحملة</h2>
-      <form class="card" onsubmit="handleVolunteer(event)">
-        <div class="form-row">
-          <input type="text" placeholder="الاسم الكامل" required>
-          <input type="email" placeholder="البريد الإلكتروني" required>
-        </div>
-        <div class="form-row">
-          <input type="tel" placeholder="رقم الهاتف" required>
-          <select required>
-            <option value="">اختر مجال المشاركة</option>
-            <option>التعليم والتوعية</option>
-            <option>الشباب والرياضة</option>
-            <option>الخدمات والأعمار</option>
-            <option>الإعلام والتواصل</option>
-            <option>الشؤون القانونية</option>
-          </select>
-        </div>
-        <textarea placeholder="نبذة مختصرة ولماذا ترغب بالمشاركة؟" required></textarea>
-        <button class="btn primary" style="width:100%;margin-top:8px">إرسال طلب الانضمام</button>
-      </form>
-    </section>
-
-    <!-- تواصل -->
-    <section id="contact">
-      <h2>تواصل</h2>
-      <form class="card" onsubmit="handleContact(event)">
-        <div class="form-row">
-          <input type="text" placeholder="الاسم الكامل" required>
-          <input type="email" placeholder="البريد الإلكتروني" required>
-        </div>
-        <div class="form-row">
-          <input type="tel" placeholder="رقم الهاتف">
-          <input type="text" placeholder="القضاء/الحي">
-        </div>
-        <textarea placeholder="رسالتك" required></textarea>
-        <button class="btn primary" style="width:100%;margin-top:8px">إرسال</button>
-        <div class="social">
-          <a id="fb" href="https://www.facebook.com/Oday.M.J/" target="_blank" rel="noopener">📘</a>
-          <a id="x"  href="#" target="_blank" rel="noopener">𝕏</a>
-          <a id="ig" href="#" target="_blank" rel="noopener">📷</a>
-          <a id="wa" href="#" target="_blank" rel="noopener">🟢</a>
-          <a id="tg" href="#" target="_blank" rel="noopener">📱</a>
-          <a id="em" href="mailto:" rel="noopener">✉️</a>
-        </div>
-        <p class="lead" style="text-align:center;color:#6b736d;margin:10px 0 0">هذا الموقع تابع للحملة الانتخابية للمرشح.</p>
-      </form>
-    </section>
-
-    <footer>© 2025 حملة المرشح عَدّي محمد المعجل — جميع الحقوق محفوظة.</footer>
-
-    <!-- شريط تنقّل سفلي للموبايل -->
-    <nav class="bottomnav" aria-label="التنقّل السفلي">
-      <div class="tabs">
-        <a class="tab" href="#about">عن المرشح</a>
-        <a class="tab" href="#program">البرنامج</a>
-        <a class="tab" href="#events">الفعاليات</a>
-        <a class="tab" href="#offices" aria-current="page">المكاتب</a>
-        <a class="tab" href="#volunteers">المتطوعون</a>
-        <a class="tab" href="#contact">تواصل</a>
-      </div>
-    </nav>
   </div>
+  <nav>
+    <a href="#about">عن المرشح</a>
+    <a href="#cv">السيرة الذاتية</a>
+    <a href="#program">البرنامج</a>
+    <a href="#events">الفعاليات</a>
+    <a href="#offices">المكاتب</a>
+    <a href="#volunteers">المتطوعون</a>
+    <a href="#contact">تواصل</a>
+  </nav>
+</header>
 
-  <script>
-    // سلوك بسيط للنماذج
-    function handleContact(e){e.preventDefault();alert("تم استلام رسالتك. شكرًا لتواصلكم.");e.target.reset();}
-    function handleVolunteer(e){e.preventDefault();alert("وصل طلب انضمامك، سنعاود التواصل قريبًا.");e.target.reset();}
+<!-- مقدمة -->
+<section id="about" class="hero">
+  <div class="card">
+    <h2 class="hero-title">عَدّي محمد المعجل</h2>
+    <p class="lead">مرشح لعضوية مجلس النواب العراقي. رؤيتنا: تعليم فعّال، بنية تحتية عملية، وفرص حقيقية للشباب. الحملة ملتزمة بالانضباط والشفافية واحترام القانون.</p>
+    <div style="margin-top:12px">
+      <a class="btn primary" href="#program">البرنامج الانتخابي</a>
+      <a class="btn ghost" href="#contact">انضم للحملة / تواصل</a>
+    </div>
+  </div>
+  <div class="card" style="text-align:center">
+    <img class="portrait" src="assets/candidate-portrait.jpg" alt="صورة رسمية للمرشح عَدّي محمد المعجل أمام العلم العراقي">
+    <p style="margin:12px 0 0;font-weight:700">مرشح لعضوية مجلس النواب</p>
+  </div>
+</section>
 
-    // تمرير سلس
-    document.querySelectorAll('a[href^="#"]').forEach(a=>{
-      a.addEventListener('click',e=>{
-        const id=a.getAttribute('href'); if(id.length<2) return;
-        const el=document.querySelector(id);
-        if(el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth',block:'start'}); }
-      });
-    });
-  </script>
+<!-- السيرة الذاتية -->
+<section id="cv">
+  <h2>السيرة الذاتية</h2>
+  <div class="card lead">
+    <p><strong>الاسم:</strong> عدي محمد المعجل</p>
+    <p><strong>سنة الميلاد:</strong> 1975</p>
+    <p><strong>المؤهل العلمي:</strong> بكالوريوس تربية رياضية</p>
+    <p><strong>محل السكن:</strong> محافظة الأنبار – مدينة الرمادي – منطقة 8 شباط</p>
+    <hr>
+    <h3>المسار المهني</h3>
+    <ul>
+      <li>تربوي وخبير في مجال التعليم والتدريب الرياضي.</li>
+      <li>صاحب خبرة طويلة في العمل الإداري والتربوي وخدمة المجتمع المحلي.</li>
+    </ul>
+    <h3>النشاط والخدمة المجتمعية</h3>
+    <ul>
+      <li>مشاركات واسعة في حملات تطوير البنية التحتية والخدمات العامة في مدينة الرمادي.</li>
+      <li>دعم مشاريع شبابية ورياضية واجتماعية تسهم في تطوير قدرات الشباب.</li>
+    </ul>
+    <h3>الرؤية</h3>
+    <ul>
+      <li>تعزيز دور التعليم والرياضة في بناء جيل واعٍ وصحي.</li>
+      <li>تطوير الخدمات العامة ورفع كفاءة البنى التحتية بما يخدم المواطن.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- البرنامج الانتخابي -->
+<section id="program">
+  <h2>البرنامج الانتخابي</h2>
+  <div class="grid3">
+    <article class="card program-card">
+      <h3>🎓 التعليم أولاً</h3>
+      <ul class="program"><li>تحديث المناهج وربطها بسوق العمل</li><li>تجهيز المختبرات وتدريب المعلمين رقمياً</li><li>منح للمتفوّقين وأنشطة مدرسية</li></ul>
+    </article>
+    <article class="card program-card">
+      <h3>🏗️ بنية تحتية عملية</h3>
+      <ul class="program"><li>صيانة الطرق وخدمات الأحياء</li><li>استقرار الكهرباء والمياه بحلول مرحلية</li><li>تحسين الإنترنت والاتصالات</li></ul>
+    </article>
+    <article class="card program-card">
+      <h3>👥 تمكين الشباب</h3>
+      <ul class="program"><li>تدريب مهني وتقني مع فرص توظيف</li><li>قروض صغيرة للمشاريع الناشئة</li><li>حاضنات ابتكار ومراكز ريادة</li></ul>
+    </article>
+  </div>
+</section>
+
+<!-- الفعاليات -->
+<section id="events">
+  <h2>الفعاليات القادمة</h2>
+  <div class="card">
+    <p><strong>15 كانون الأول:</strong> لقاء مفتوح مع الشباب – مركز الشباب الثقافي – 6:00 مساءً</p>
+    <p><strong>18 كانون الأول:</strong> جولة ميدانية – 9:00 صباحاً</p>
+    <p><strong>22 كانون الأول:</strong> ندوة التنمية المحلية – قاعة المؤتمرات – 4:00 عصراً</p>
+  </div>
+</section>
+
+<!-- المكاتب -->
+<section id="offices">
+  <h2>المكاتب الرسمية للحملة</h2>
+  <div class="grid3">
+    <a class="card program-card" href="https://www.facebook.com/Oday.M.J/" target="_blank"><h3>📢 المكتب الإعلامي الرسمي</h3></a>
+    <a class="card program-card" href="https://www.facebook.com/profile.php?id=61581051510619" target="_blank"><h3>🏢 مكتب منطقة 8 شباط</h3></a>
+    <a class="card program-card" href="https://www.facebook.com/profile.php?id=100063876993331" target="_blank"><h3>🏟️ مكتب منطقة الملعب</h3></a>
+  </div>
+</section>
+
+<!-- المتطوعون -->
+<section id="volunteers">
+  <h2>انضم للحملة</h2>
+  <form class="card" onsubmit="event.preventDefault();alert('تم استلام طلب الانضمام.');this.reset();">
+    <input type="text" placeholder="الاسم الكامل" required>
+    <input type="email" placeholder="البريد الإلكتروني" required>
+    <textarea placeholder="نبذة مختصرة ولماذا ترغب بالمشاركة؟" required></textarea>
+    <button class="btn primary" style="width:100%">إرسال طلب الانضمام</button>
+  </form>
+</section>
+
+<!-- تواصل -->
+<section id="contact">
+  <h2>تواصل</h2>
+  <form class="card" onsubmit="event.preventDefault();alert('تم استلام رسالتك.');this.reset();">
+    <input type="text" placeholder="الاسم الكامل" required>
+    <input type="email" placeholder="البريد الإلكتروني" required>
+    <textarea placeholder="رسالتك" required></textarea>
+    <button class="btn primary" style="width:100%">إرسال</button>
+  </form>
+</section>
+
+<footer>© 2025 حملة المرشح عَدّي محمد المعجل — جميع الحقوق محفوظة.</footer>
+
+</div>
 </body>
 </html>
