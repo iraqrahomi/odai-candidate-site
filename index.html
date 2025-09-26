@@ -1,182 +1,810 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>المرشح عَدّي محمد المعجل — الموقع الرسمي للحملة</title>
-<meta name="description" content="الموقع الرسمي للحملة الانتخابية للمرشح عَدّي محمد المعجل — السيرة الذاتية، البرنامج الانتخابي، الفعاليات، المكاتب وقنوات التواصل.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{
- --accent:#0a6b3f;--accent-dark:#07492a;--accent-weak:#e7f3ec;
- --bg:#f5f7f6;--card:#fff;--text:#151a16;--muted:#647067;
- --radius:16px;--maxw:1100px;
- font-family:"Noto Kufi Arabic",system-ui,sans-serif;
-}
-*,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-a{text-decoration:none;color:inherit}
-.wrap{max-width:var(--maxw);margin:auto;padding:clamp(12px,2.5vw,20px)}
-header{background:#fff;border-radius:20px;border:1px solid #e6e8e7;
- padding:12px 18px;display:flex;gap:16px;align-items:center;justify-content:space-between;
- position:sticky;top:0;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.05)}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{inline-size:50px;block-size:50px;border-radius:14px;
- background:linear-gradient(135deg,#caa24a,#e8d078);display:grid;place-items:center;font-weight:800}
-nav{display:flex;gap:10px;flex-wrap:wrap}
-nav a{padding:10px 14px;border-radius:10px;color:var(--muted);font-weight:700}
-nav a:hover{background:var(--accent-weak);color:var(--accent)}
-.hero{display:grid;gap:20px}
-.card{background:var(--card);border-radius:var(--radius);border:1px solid #e6e8e7;
- padding:20px;box-shadow:0 8px 24px rgba(0,0,0,.05)}
-.hero-title{margin:0;font-size:clamp(22px,5.5vw,30px);
- background:linear-gradient(135deg,var(--accent),var(--accent-dark));
- -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.lead{color:var(--muted);line-height:1.8}
-.btn{display:inline-block;padding:12px 18px;border-radius:12px;font-weight:800}
-.btn.primary{background:var(--accent);color:#fff}
-.btn.ghost{border:2px solid var(--accent);color:var(--accent)}
-section{margin:40px 0}
-section h2{text-align:center;font-size:clamp(20px,5vw,26px);margin-bottom:20px}
-.grid3{display:grid;gap:16px}
-@media(min-width:720px){.hero{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:repeat(3,1fr)}}
-.portrait{border-radius:16px;border:4px solid #fff;box-shadow:0 12px 32px rgba(0,0,0,.08)}
-.program-card h3{margin-top:0;color:var(--accent)}
-ul.program{list-style:none;padding:0;margin:0}
-ul.program li{background:var(--accent-weak);border-inline-start:4px solid var(--accent);padding:10px;border-radius:12px;margin:6px 0}
-footer{color:var(--muted);text-align:center;margin-top:40px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>مركز مراقبة الانتخابات — تسجيل الدخول ولوحات الأدوار</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{box-sizing:border-box}
+    .fade-in{animation:fadeIn .5s ease-in}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .slide-in{animation:slideIn .3s ease-out}
+    @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+    .pulse-dot{animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  </style>
 </head>
-<body>
-<div class="wrap">
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
 
-<header>
-  <div class="brand">
-    <div class="logo">ع</div>
-    <div>
-      <strong>المرشح عَدّي محمد المعجل</strong><br>
-      <small class="muted">الحملة الانتخابية — خدمة الأنبار بشفافية ومسؤولية</small>
+<!-- ------------------------[ CONFIG ]------------------------- -->
+<script>
+  // ضع هنا رابط Web App للسكربت الخاص بك (نفس الذي يعمل لديك)
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbyLqRd8M5glddJ7esC4vwOkG6PTHCDeISxD0l6iNN7iwvJFTOMrWM7KF5I2LyCEew51/exec";
+
+  // مهلات وترددات
+  const HEARTBEAT_MS = 60000;      // نبضة المراقب كل 60 ثانية
+  const ACTIVITY_REFRESH_MS = 30000;// تحديث لوحة النشاط كل 30 ثانية
+
+  // أسماء الأدوار بالعربي
+  const ROLE_NAMES = {
+    admin: 'مدير النظام',
+    supervisor: 'مشرف عام',
+    monitor: 'مراقب ميداني',
+    operator: 'مشغل مركز',
+    viewer: 'مشاهد'
+  };
+</script>
+
+<!-- ------------------------[ LOGIN PAGE ]------------------------- -->
+<div id="loginPage" class="min-h-screen flex items-center justify-center px-4">
+  <div class="max-w-md w-full">
+    <div class="text-center mb-8 fade-in">
+      <div class="bg-blue-600 text-white p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+        <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">مركز مراقبة الانتخابات</h1>
+      <p class="text-gray-600">نظام إدارة ومراقبة العملية الانتخابية</p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg p-8 fade-in">
+      <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">تسجيل الدخول</h2>
+
+      <form id="loginForm" class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">اسم المستخدم</label>
+          <input type="text" id="username" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="أدخل اسم المستخدم" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">كلمة المرور / PIN</label>
+          <div class="relative">
+            <input type="password" id="password" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="أدخل كلمة المرور أو PIN" required>
+            <button type="button" id="togglePassword" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">نوع المستخدم</label>
+          <select id="userRole" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+            <option value="">اختر نوع المستخدم</option>
+            <option value="admin">مدير النظام</option>
+            <option value="supervisor">مشرف عام</option>
+            <option value="monitor">مراقب ميداني</option>
+            <option value="operator">مشغل مركز</option>
+            <option value="viewer">مشاهد</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <label class="flex items-center">
+            <input type="checkbox" id="rememberMe" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span class="mr-2 text-sm text-gray-600">تذكرني</span>
+          </label>
+          <span class="text-sm text-gray-400">الإصدار: واجهة عامة</span>
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+          تسجيل الدخول
+        </button>
+      </form>
+
+      <!-- حسابات تجريبية (تُستخدم فقط لو تعذر الـ API) -->
+      <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-700 mb-3">حسابات تجريبية (للنسخ الاحتياطي فقط):</h3>
+        <div class="space-y-2 text-xs">
+          <div class="flex justify-between"><span class="text-gray-600">مدير النظام:</span><span class="font-mono">admin / admin123</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">مشرف عام:</span><span class="font-mono">supervisor / super123</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">مراقب ميداني:</span><span class="font-mono">monitor / monitor123</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">مشغل مركز:</span><span class="font-mono">operator / op123</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">مشاهد:</span><span class="font-mono">viewer / view123</span></div>
+        </div>
+      </div>
     </div>
   </div>
-  <nav>
-    <a href="#about">عن المرشح</a>
-    <a href="#cv">السيرة الذاتية</a>
-    <a href="#program">البرنامج</a>
-    <a href="#events">الفعاليات</a>
-    <a href="#offices">المكاتب</a>
-    <a href="#volunteers">المتطوعون</a>
-    <a href="#contact">تواصل</a>
-  </nav>
-</header>
-
-<!-- مقدمة -->
-<section id="about" class="hero">
-  <div class="card">
-    <h2 class="hero-title">عَدّي محمد المعجل</h2>
-    <p class="lead">مرشح لعضوية مجلس النواب العراقي. رؤيتنا: تعليم فعّال، بنية تحتية عملية، وفرص حقيقية للشباب. الحملة ملتزمة بالانضباط والشفافية واحترام القانون.</p>
-    <div style="margin-top:12px">
-      <a class="btn primary" href="#program">البرنامج الانتخابي</a>
-      <a class="btn ghost" href="#contact">انضم للحملة / تواصل</a>
-    </div>
-  </div>
-  <div class="card" style="text-align:center">
-    <img class="portrait" src="assets/candidate-portrait.jpg" alt="صورة رسمية للمرشح عَدّي محمد المعجل أمام العلم العراقي">
-    <p style="margin:12px 0 0;font-weight:700">مرشح لعضوية مجلس النواب</p>
-  </div>
-</section>
-
-<!-- السيرة الذاتية -->
-<section id="cv">
-  <h2>السيرة الذاتية</h2>
-  <div class="card lead">
-    <p><strong>الاسم:</strong> عدي محمد المعجل</p>
-    <p><strong>سنة الميلاد:</strong> 1975</p>
-    <p><strong>المؤهل العلمي:</strong> بكالوريوس تربية رياضية</p>
-    <p><strong>محل السكن:</strong> محافظة الأنبار – مدينة الرمادي – منطقة 8 شباط</p>
-    <hr>
-    <h3>المسار المهني</h3>
-    <ul>
-      <li>تربوي وخبير في مجال التعليم والتدريب الرياضي.</li>
-      <li>صاحب خبرة طويلة في العمل الإداري والتربوي وخدمة المجتمع المحلي.</li>
-    </ul>
-    <h3>النشاط والخدمة المجتمعية</h3>
-    <ul>
-      <li>مشاركات واسعة في حملات تطوير البنية التحتية والخدمات العامة في مدينة الرمادي.</li>
-      <li>دعم مشاريع شبابية ورياضية واجتماعية تسهم في تطوير قدرات الشباب.</li>
-    </ul>
-    <h3>الرؤية</h3>
-    <ul>
-      <li>تعزيز دور التعليم والرياضة في بناء جيل واعٍ وصحي.</li>
-      <li>تطوير الخدمات العامة ورفع كفاءة البنى التحتية بما يخدم المواطن.</li>
-    </ul>
-  </div>
-</section>
-
-<!-- البرنامج الانتخابي -->
-<section id="program">
-  <h2>البرنامج الانتخابي</h2>
-  <div class="grid3">
-    <article class="card program-card">
-      <h3>🎓 التعليم أولاً</h3>
-      <ul class="program"><li>تحديث المناهج وربطها بسوق العمل</li><li>تجهيز المختبرات وتدريب المعلمين رقمياً</li><li>منح للمتفوّقين وأنشطة مدرسية</li></ul>
-    </article>
-    <article class="card program-card">
-      <h3>🏗️ بنية تحتية عملية</h3>
-      <ul class="program"><li>صيانة الطرق وخدمات الأحياء</li><li>استقرار الكهرباء والمياه بحلول مرحلية</li><li>تحسين الإنترنت والاتصالات</li></ul>
-    </article>
-    <article class="card program-card">
-      <h3>👥 تمكين الشباب</h3>
-      <ul class="program"><li>تدريب مهني وتقني مع فرص توظيف</li><li>قروض صغيرة للمشاريع الناشئة</li><li>حاضنات ابتكار ومراكز ريادة</li></ul>
-    </article>
-  </div>
-</section>
-
-<!-- الفعاليات -->
-<section id="events">
-  <h2>الفعاليات القادمة</h2>
-  <div class="card">
-    <p><strong>15 كانون الأول:</strong> لقاء مفتوح مع الشباب – مركز الشباب الثقافي – 6:00 مساءً</p>
-    <p><strong>18 كانون الأول:</strong> جولة ميدانية – 9:00 صباحاً</p>
-    <p><strong>22 كانون الأول:</strong> ندوة التنمية المحلية – قاعة المؤتمرات – 4:00 عصراً</p>
-  </div>
-</section>
-
-<!-- المكاتب -->
-<section id="offices">
-  <h2>المكاتب الرسمية للحملة</h2>
-  <div class="grid3">
-    <a class="card program-card" href="https://www.facebook.com/Oday.M.J/" target="_blank"><h3>📢 المكتب الإعلامي الرسمي</h3></a>
-    <a class="card program-card" href="https://www.facebook.com/profile.php?id=61581051510619" target="_blank"><h3>🏢 مكتب منطقة 8 شباط</h3></a>
-    <a class="card program-card" href="https://www.facebook.com/profile.php?id=100063876993331" target="_blank"><h3>🏟️ مكتب منطقة الملعب</h3></a>
-  </div>
-</section>
-
-<!-- المتطوعون -->
-<section id="volunteers">
-  <h2>انضم للحملة</h2>
-  <form class="card" onsubmit="event.preventDefault();alert('تم استلام طلب الانضمام.');this.reset();">
-    <input type="text" placeholder="الاسم الكامل" required>
-    <input type="email" placeholder="البريد الإلكتروني" required>
-    <textarea placeholder="نبذة مختصرة ولماذا ترغب بالمشاركة؟" required></textarea>
-    <button class="btn primary" style="width:100%">إرسال طلب الانضمام</button>
-  </form>
-</section>
-
-<!-- تواصل -->
-<section id="contact">
-  <h2>تواصل</h2>
-  <form class="card" onsubmit="event.preventDefault();alert('تم استلام رسالتك.');this.reset();">
-    <input type="text" placeholder="الاسم الكامل" required>
-    <input type="email" placeholder="البريد الإلكتروني" required>
-    <textarea placeholder="رسالتك" required></textarea>
-    <button class="btn primary" style="width:100%">إرسال</button>
-  </form>
-</section>
-
-<footer>© 2025 حملة المرشح عَدّي محمد المعجل — جميع الحقوق محفوظة.</footer>
-
 </div>
+
+<!-- ------------------------[ DASHBOARD SHELL ]------------------------- -->
+<div id="dashboardPage" class="hidden">
+  <!-- Top Bar -->
+  <nav class="bg-white shadow-lg border-b-4 border-blue-600">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center gap-3">
+          <div class="bg-blue-600 text-white p-2 rounded-lg">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h1 class="text-2xl font-bold text-gray-800">مركز مراقبة الانتخابات</h1>
+        </div>
+        <div class="flex items-center gap-4">
+          <span id="connBadge" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium flex items-center gap-2">
+            <span class="w-2 h-2 bg-green-500 rounded-full pulse-dot"></span>
+            متصل
+          </span>
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <span id="userInitials" class="text-blue-600 font-medium text-sm"></span>
+            </div>
+            <div class="text-right">
+              <div id="userName" class="text-sm font-medium text-gray-800"></div>
+              <div id="userRoleDisplay" class="text-xs text-gray-600"></div>
+            </div>
+          </div>
+          <button id="logoutBtn" class="text-gray-600 hover:text-gray-800 p-2" title="تسجيل الخروج">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- ======== ACTIVITY (مشترك للجميع ما عدا viewer) ======== -->
+    <div id="activityDashboard" class="hidden mb-8">
+      <div class="mb-4">
+        <h2 class="text-xl font-bold text-gray-800">النشاط اللحظي</h2>
+        <p class="text-gray-500 text-sm">تُحدّث تلقائيًا كل 30 ثانية</p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl shadow p-4">
+          <p class="text-gray-600 text-sm">نشطون الآن</p>
+          <p id="activeUsersCount" class="text-3xl font-bold text-green-600">0</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4">
+          <p class="text-gray-600 text-sm">استراحة</p>
+          <p id="breakUsersCount" class="text-3xl font-bold text-yellow-600">0</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4">
+          <p class="text-gray-600 text-sm">في مهمة</p>
+          <p id="taskUsersCount" class="text-3xl font-bold text-blue-600">0</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4">
+          <p class="text-gray-600 text-sm">غير متصل</p>
+          <p id="offlineUsersCount" class="text-3xl font-bold text-red-600">0</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4">
+        <div class="lg:col-span-2 bg-white rounded-xl shadow p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold">قائمة النشاط</h3>
+            <button id="refreshActivityBtn" class="text-sm px-3 py-1 rounded bg-gray-100 hover:bg-gray-200">تحديث</button>
+          </div>
+          <div id="activityList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow p-4">
+          <h3 class="font-bold mb-3">خريطة مبسطة</h3>
+          <div class="relative bg-gray-100 rounded-lg h-64 overflow-hidden">
+            <div id="mapMarkers" class="absolute inset-0"></div>
+            <div class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm select-none">خريطة توضيحية (بدون مزود خرائط)</div>
+          </div>
+          <div class="mt-2 text-xs text-gray-500">
+            ملاحظة: للعرض السريع فقط. الخرائط الدقيقة يمكن إضافتها لاحقًا عبر Leaflet.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== ADMIN ======== -->
+    <div id="adminDashboard" class="hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">لوحة تحكم المدير</h2>
+        <p class="text-gray-600">إدارة شاملة لجميع جوانب النظام</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-600 text-sm">إجمالي المستخدمين</p>
+              <p id="statUsers" class="text-3xl font-bold text-blue-600">0</p>
+            </div>
+            <div class="bg-blue-100 p-3 rounded-lg">
+              <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-600 text-sm">المراكز النشطة</p>
+              <p id="statCenters" class="text-3xl font-bold text-green-600">0</p>
+            </div>
+            <div class="bg-green-100 p-3 rounded-lg">
+              <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-600 text-sm">التقارير اليومية</p>
+              <p id="statDailyReports" class="text-3xl font-bold text-purple-600">0</p>
+            </div>
+            <div class="bg-purple-100 p-3 rounded-lg">
+              <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-gray-600 text-sm">حالة النظام</p>
+              <p id="statSystem" class="text-lg font-bold text-green-600">-</p>
+            </div>
+            <div class="bg-green-100 p-3 rounded-lg">
+              <div class="w-2 h-2 bg-green-500 rounded-full pulse-dot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold mb-4">إدارة المستخدمين</h3>
+          <div class="space-y-3">
+            <button class="w-full bg-blue-100 text-blue-800 py-3 px-4 rounded-lg hover:bg-blue-200 transition-colors text-right">
+              👥 إضافة مستخدم جديد
+            </button>
+            <button class="w-full bg-green-100 text-green-800 py-3 px-4 rounded-lg hover:bg-green-200 transition-colors text-right">
+              🔧 إدارة الصلاحيات
+            </button>
+            <button id="btnUsersReport" class="w-full bg-purple-100 text-purple-800 py-3 px-4 rounded-lg hover:bg-purple-200 transition-colors text-right">
+              📊 تقارير المستخدمين
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold mb-4">إعدادات النظام</h3>
+          <div class="space-y-3">
+            <button class="w-full bg-orange-100 text-orange-800 py-3 px-4 rounded-lg hover:bg-orange-200 transition-colors text-right">
+              ⚙️ إعدادات عامة
+            </button>
+            <button class="w-full bg-red-100 text-red-800 py-3 px-4 rounded-lg hover:bg-red-200 transition-colors text-right">
+              🔒 أمان النظام
+            </button>
+            <button id="btnBackup" class="w-full bg-gray-100 text-gray-800 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors text-right">
+              💾 نسخ احتياطي
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== SUPERVISOR ======== -->
+    <div id="supervisorDashboard" class="hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">لوحة تحكم المشرف العام</h2>
+        <p class="text-gray-600">مراقبة ومتابعة العمليات الانتخابية</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold mb-4">المراكز تحت الإشراف</h3>
+          <p id="supCenters" class="text-3xl font-bold text-blue-600 mb-2">0</p>
+          <p class="text-sm text-gray-600">مراكز فعّالة</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold mb-4">الحوادث المعلقة</h3>
+          <p id="supPending" class="text-3xl font-bold text-orange-600 mb-2">0</p>
+          <p class="text-sm text-gray-600">تحتاج متابعة</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold mb-4">التقارير المرسلة (اليوم)</h3>
+          <p id="supReports" class="text-3xl font-bold text-green-600 mb-2">0</p>
+          <p class="text-sm text-gray-600">عدد البلاغات/التقارير</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-lg font-bold mb-4">أدوات الإشراف</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <button class="bg-blue-100 text-blue-800 py-3 px-4 rounded-lg hover:bg-blue-200 transition-colors">📋 مراجعة التقارير</button>
+          <button class="bg-green-100 text-green-800 py-3 px-4 rounded-lg hover:bg-green-200 transition-colors">✅ اعتماد البيانات</button>
+          <button class="bg-orange-100 text-orange-800 py-3 px-4 rounded-lg hover:bg-orange-200 transition-colors">🚨 إدارة التنبيهات</button>
+          <button id="btnSupFullReport" class="bg-purple-100 text-purple-800 py-3 px-4 rounded-lg hover:bg-purple-200 transition-colors">📊 تقرير شامل</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== MONITOR ======== -->
+    <div id="monitorDashboard" class="hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">لوحة تحكم المراقب الميداني</h2>
+        <p class="text-gray-600">تسجيل ومتابعة الأحداث الميدانية</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold mb-4">إبلاغ سريع</h3>
+          <div class="space-y-3">
+            <button class="w-full bg-red-100 text-red-800 py-3 px-4 rounded-lg hover:bg-red-200 transition-colors text-right" data-quick="critical">🚨 حادث عاجل</button>
+            <button class="w-full bg-orange-100 text-orange-800 py-3 px-4 rounded-lg hover:bg-orange-200 transition-colors text-right" data-quick="equipment">⚠️ مشكلة تقنية</button>
+            <button class="w-full bg-yellow-100 text-yellow-800 py-3 px-4 rounded-lg hover:bg-yellow-200 transition-colors text-right" data-quick="crowd">👥 ازدحام</button>
+            <button class="w-full bg-blue-100 text-blue-800 py-3 px-4 rounded-lg hover:bg-blue-200 transition-colors text-right" data-quick="note">📝 ملاحظة عامة</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold mb-4">الحالة الميدانية</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between"><span>حالة الاتصال</span><span id="monConn" class="font-medium text-green-600">متصل</span></div>
+            <div class="flex justify-between"><span>آخر نبضة</span><span id="monBeat" class="text-gray-600">-</span></div>
+            <div class="flex justify-between"><span>الموقع الحالي</span><span id="monLoc" class="text-gray-600">-</span></div>
+            <div class="flex justify-between"><span>الكود/المركز</span><span id="monCenter" class="text-gray-600">-</span></div>
+          </div>
+          <div class="mt-4 flex gap-2">
+            <button id="btnStartShift" class="flex-1 bg-green-600 text-white py-2 rounded hover:bg-green-700">بدء النوبة</button>
+            <button id="btnEndShift"   class="flex-1 bg-gray-200 text-gray-800 py-2 rounded hover:bg-gray-300">إنهاء النوبة</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== OPERATOR ======== -->
+    <div id="operatorDashboard" class="hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">لوحة تحكم مشغل المركز</h2>
+        <p class="text-gray-600">إدارة عمليات المركز الانتخابي</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold mb-4">حالة المركز</h3>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center"><span>حالة التشغيل</span><span id="opRun" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">نشط</span></div>
+            <div class="flex justify-between items-center"><span>عدد الناخبين</span><span id="opVoters" class="font-bold">0</span></div>
+            <div class="flex justify-between items-center"><span>الأصوات المسجلة</span><span id="opVotes" class="font-bold text-blue-600">0</span></div>
+            <div class="flex justify-between items-center"><span>نسبة المشاركة</span><span id="opRate" class="font-bold text-green-600">0%</span></div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold mb-4">عمليات سريعة</h3>
+          <div class="space-y-3">
+            <button class="w-full bg-blue-100 text-blue-800 py-3 px-4 rounded-lg hover:bg-blue-200 transition-colors text-right">📊 تحديث الإحصائيات</button>
+            <button class="w-full bg-green-100 text-green-800 py-3 px-4 rounded-lg hover:bg-green-200 transition-colors text-right">📝 تسجيل ملاحظة</button>
+            <button class="w-full bg-orange-100 text-orange-800 py-3 px-4 rounded-lg hover:bg-orange-200 transition-colors text-right">🔧 طلب دعم تقني</button>
+            <button class="w-full bg-purple-100 text-purple-800 py-3 px-4 rounded-lg hover:bg-purple-200 transition-colors text-right">📋 إرسال تقرير</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== VIEWER ======== -->
+    <div id="viewerDashboard" class="hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">لوحة المشاهدة</h2>
+        <p class="text-gray-600">عرض البيانات والإحصائيات</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold mb-4">إجمالي المراكز</h3>
+          <p id="vwCenters" class="text-3xl font-bold text-blue-600">0</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold mb-4">إجمالي الناخبين</h3>
+          <p id="vwVoters" class="text-3xl font-bold text-green-600">0</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold mb-4">نسبة المشاركة</h3>
+          <p id="vwRate" class="text-3xl font-bold text-purple-600">0%</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-lg font-bold mb-4">الإحصائيات العامة</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="font-medium mb-3">توزيع الحوادث حسب النوع</h4>
+            <div class="space-y-2" id="vwTypeDist"></div>
+          </div>
+          <div>
+            <h4 class="font-medium mb-3">حالة المراكز</h4>
+            <div class="space-y-2" id="vwCenterState"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- رسائل عائمة -->
+<div id="messageContainer" class="fixed top-4 left-4 z-50"></div>
+
+<!-- ------------------------[ APP LOGIC ]------------------------- -->
+<script>
+  // جلسة المستخدم
+  let currentUser = null;
+  let heartbeatTimer = null;
+  let activityTimer = null;
+  let demoMode = false; // يعمل تلقائياً لو تعذر الـ API
+
+  // حسابات تجريبية كنسخ احتياطي فقط
+  const FALLBACK_USERS = {
+    admin:      { password:'admin123',      role:'admin',      name:'أحمد المدير'     },
+    supervisor: { password:'super123',      role:'supervisor', name:'فاطمة المشرفة'   },
+    monitor:    { password:'monitor123',    role:'monitor',    name:'محمد المراقب'    },
+    operator:   { password:'op123',         role:'operator',   name:'سارة المشغلة'    },
+    viewer:     { password:'view123',       role:'viewer',     name:'علي المشاهد'     },
+  };
+
+  // عناصر DOM سريعة
+  const $ = (id)=>document.getElementById(id);
+
+  // رسائل
+  function toast(text,type='success'){
+    const c=$('messageContainer'); const d=document.createElement('div');
+    d.className = (type==='success'?'bg-green-500':'bg-red-500')+' text-white px-6 py-3 rounded-lg shadow-lg mb-2 slide-in';
+    d.textContent = text; c.appendChild(d); setTimeout(()=>d.remove(),4500);
+  }
+
+  // تبديل إظهار كلمة المرور
+  document.addEventListener('DOMContentLoaded',()=>{
+    $('togglePassword').addEventListener('click',()=>{
+      const p=$('password'); p.type = (p.type==='password'?'text':'password');
+    });
+    $('loginForm').addEventListener('submit',handleLogin);
+    $('logoutBtn').addEventListener('click',handleLogout);
+    document.body.addEventListener('click',(e)=>{
+      if(e.target?.id==='refreshActivityBtn'){ updateActivity(true); toast('تم تحديث بيانات النشاط','success'); }
+    });
+
+    // استعادة جلسة
+    const saved=localStorage.getItem('currentUser');
+    if(saved){ try{ currentUser=JSON.parse(saved); showDashboard(); }catch{} }
+  });
+
+  // اتصال API عام (GET/POST)
+  async function api(action, payload={}, method='POST'){
+    const url = GAS_URL + '?action=' + encodeURIComponent(action);
+    const opts = (method==='GET')
+      ? { method:'GET' }
+      : { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) };
+
+    try{
+      const res = await fetch(url, opts);
+      const isJson = (res.headers.get('content-type')||'').includes('application/json');
+      const data = isJson ? await res.json() : await res.text();
+      if(!res.ok) throw new Error(typeof data==='string'?data:(data?.error||'HTTP '+res.status));
+      return data;
+    }catch(err){
+      console.warn('API error', action, err);
+      // وضع النسخ الاحتياطي بدون كسر الواجهة
+      if(!demoMode){ demoMode = true; $('connBadge').classList.remove('bg-green-100','text-green-800'); $('connBadge').classList.add('bg-yellow-100','text-yellow-800'); $('connBadge').innerHTML = '<span class="w-2 h-2 bg-yellow-500 rounded-full pulse-dot"></span> وضع الاختبار';
+      }
+      return {ok:false,error:String(err)};
+    }
+  }
+
+  // تسجيل الدخول
+  async function handleLogin(e){
+    e.preventDefault();
+    const username=$('username').value.trim();
+    const password=$('password').value.trim();
+    const role=$('userRole').value;
+
+    // محاولة عبر الـ API
+    let ok=false, name=username;
+    if(GAS_URL){
+      const resp = await api('login',{username, password, role},'POST');
+      if(resp && resp.ok && resp.user){
+        ok=true; name=resp.user.full_name||username;
+      }
+    }
+    // fallback محلي
+    if(!ok && FALLBACK_USERS[username] && FALLBACK_USERS[username].password===password && FALLBACK_USERS[username].role===role){
+      ok=true; name=FALLBACK_USERS[username].name;
+    }
+
+    if(!ok){ toast('بيانات الدخول غير صحيحة','error'); return; }
+
+    currentUser = { username, role, name };
+    if($('rememberMe').checked){ localStorage.setItem('currentUser', JSON.stringify(currentUser)); }
+    toast('تم تسجيل الدخول بنجاح','success');
+    setTimeout(showDashboard, 500);
+  }
+
+  // تسجيل الخروج
+  function handleLogout(){
+    localStorage.removeItem('currentUser'); currentUser=null;
+    clearInterval(heartbeatTimer); clearInterval(activityTimer);
+    $('dashboardPage').classList.add('hidden');
+    $('loginPage').classList.remove('hidden');
+    $('loginForm').reset();
+    toast('تم تسجيل الخروج','success');
+  }
+
+  // عرض اللوحات حسب الدور + بدء الخدمات المشتركة
+  function showDashboard(){
+    $('loginPage').classList.add('hidden');
+    $('dashboardPage').classList.remove('hidden');
+
+    // معلومات المستخدم
+    $('userName').textContent = currentUser.name;
+    $('userRoleDisplay').textContent = ROLE_NAMES[currentUser.role] || currentUser.role;
+    $('userInitials').textContent = (currentUser.name||'?').charAt(0);
+
+    // إخفاء الكل
+    ['adminDashboard','supervisorDashboard','monitorDashboard','operatorDashboard','viewerDashboard'].forEach(id=>{
+      $(id).classList.add('hidden');
+    });
+
+    // إظهار حسب الدور
+    const dashId = currentUser.role + 'Dashboard';
+    if($(dashId)){ $(dashId).classList.remove('hidden'); $(dashId).classList.add('fade-in'); }
+
+    // النشاط (يظهر للجميع ما عدا viewer)
+    if(currentUser.role!=='viewer'){ $('activityDashboard').classList.remove('hidden'); startActivityAuto(); }
+    else { $('activityDashboard').classList.add('hidden'); clearInterval(activityTimer); }
+
+    // نبضات المراقب/المشغل فقط
+    if(currentUser.role==='monitor' || currentUser.role==='operator'){ startHeartbeat(); }
+    else { clearInterval(heartbeatTimer); }
+    // تحميل إحصاءات عامة
+    loadTopStats();
+  }
+
+  // إحصاءات أعلى اللوحات
+  async function loadTopStats(){
+    // محاولة من API
+    const resp = await api('stats',{},'GET');
+    if(resp && resp.ok){
+      $('statUsers').textContent       = resp.users_total ?? 0;
+      $('statCenters').textContent     = resp.centers_active ?? 0;
+      $('statDailyReports').textContent= resp.reports_today ?? 0;
+      $('statSystem').textContent      = (resp.system_ok?'ممتاز':'تحقق مطلوب');
+      $('supCenters').textContent      = resp.centers_active ?? 0;
+      $('supPending').textContent      = resp.pending_incidents ?? 0;
+      $('supReports').textContent      = resp.reports_today ?? 0;
+      $('vwCenters').textContent       = resp.centers_total ?? 0;
+      $('vwVoters').textContent        = resp.voters_total ?? 0;
+      $('vwRate').textContent          = (resp.turnout_rate??0)+'%';
+      // توزيع أنواع الحوادث (viewer)
+      if(resp.type_dist){
+        $('vwTypeDist').innerHTML = Object.entries(resp.type_dist).map(([k,v])=>(
+          `<div class="flex justify-between"><span>${typeText(k)}</span><span class="font-bold">${v}%</span></div>`
+        )).join('');
+      }
+      if(resp.center_state){
+        $('vwCenterState').innerHTML = Object.entries(resp.center_state).map(([k,v])=>(
+          `<div class="flex justify-between"><span>${centerStateText(k)}</span><span class="font-bold">${v}</span></div>`
+        )).join('');
+      }
+      return;
+    }
+    // Fallback أرقام تجريبية محفوظة
+    $('statUsers').textContent=247; $('statCenters').textContent=156; $('statDailyReports').textContent=89; $('statSystem').textContent='وضع الاختبار';
+    $('supCenters').textContent=45; $('supPending').textContent=12; $('supReports').textContent=38;
+    $('vwCenters').textContent=200; $('vwVoters').textContent=2450000; $('vwRate').textContent='68.2%';
+    $('vwTypeDist').innerHTML = `
+      <div class="flex justify-between"><span>تقني</span><span class="font-bold">45%</span></div>
+      <div class="flex justify-between"><span>إجرائي</span><span class="font-bold">30%</span></div>
+      <div class="flex justify-between"><span>أمني</span><span class="font-bold">15%</span></div>
+      <div class="flex justify-between"><span>أخرى</span><span class="font-bold">10%</span></div>`;
+    $('vwCenterState').innerHTML = `
+      <div class="flex justify-between"><span>نشطة</span><span class="font-bold text-green-600">185</span></div>
+      <div class="flex justify-between"><span>متوقفة مؤقتاً</span><span class="font-bold text-yellow-600">12</span></div>
+      <div class="flex justify-between"><span>مغلقة</span><span class="font-bold text-red-600">3</span></div>`;
+  }
+
+  // بدء نبضات المراقب (Check-ins)
+  function startHeartbeat(){
+    sendHeartbeat(); // أول مرة فورًا
+    clearInterval(heartbeatTimer);
+    heartbeatTimer = setInterval(sendHeartbeat, HEARTBEAT_MS);
+  }
+
+  // إرسال نبضة + تحديد موقع
+  async function sendHeartbeat(){
+    if(!navigator.geolocation){
+      $('monConn')?.classList.remove('text-green-600'); $('monConn')?.classList.add('text-yellow-600');
+      $('monConn') && ( $('monConn').textContent='بدون موقع (المتصفح)' );
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(async (pos)=>{
+      const lat = +pos.coords.latitude.toFixed(6);
+      const lng = +pos.coords.longitude.toFixed(6);
+      $('monLoc') && ( $('monLoc').textContent = `${lat}, ${lng}` );
+      $('monBeat') && ( $('monBeat').textContent = new Date().toLocaleTimeString('ar-IQ') );
+
+      // center_code اختياري (يمكن قراءته من إعدادات المستخدم عبر API لاحقًا)
+      const center_code = localStorage.getItem('center_code') || '';
+
+      const payload = {
+        username: currentUser.username,
+        role: currentUser.role,
+        center_code,
+        lat, lng,
+        note: 'heartbeat'
+      };
+      const resp = await api('heartbeat', payload, 'POST');
+      if(resp && resp.ok){
+        $('monConn')?.classList.remove('text-yellow-600'); $('monConn')?.classList.add('text-green-600');
+        $('monConn') && ( $('monConn').textContent='متصل' );
+        if(resp.center_name){ $('monCenter').textContent = `${center_code||'-'} / ${resp.center_name}`; }
+      }else{
+        $('monConn')?.classList.remove('text-green-600'); $('monConn')?.classList.add('text-yellow-600');
+        $('monConn') && ( $('monConn').textContent='وضع الاختبار' );
+      }
+    },(err)=>{
+      $('monConn')?.classList.remove('text-green-600'); $('monConn')?.classList.add('text-red-600');
+      $('monConn') && ( $('monConn').textContent='رفض الموقع' );
+      console.warn('geo error',err);
+    },{enableHighAccuracy:true,maximumAge:10000,timeout:8000});
+  }
+
+  // نشاط عام (قائمة + خريطة + إحصاءات)
+  function startActivityAuto(){
+    updateActivity(true);
+    clearInterval(activityTimer);
+    activityTimer = setInterval(updateActivity, ACTIVITY_REFRESH_MS);
+  }
+
+  async function updateActivity(first=false){
+    // من API: نتوقع action=active_users يرجّع [{name, role, status, lat, lng, center_code, last_update, work_start, place_name}]
+    const resp = await api('active_users', {}, 'GET');
+    let users=[];
+    if(resp && resp.ok && Array.isArray(resp.items)){ users = resp.items; }
+    else {
+      // بيانات تجريبية لا تكسر الواجهة
+      users = [
+        {id:1,name:'أحمد محمد', role:'monitor',   status:'active',  lat:33.3152, lng:44.3661, place_name:'مركز الشهداء', last_update:new Date(),             work_start:'08:00', center_code:'C001'},
+        {id:2,name:'فاطمة علي', role:'operator',  status:'active',  lat:33.3200, lng:44.3700, place_name:'مركز النور',   last_update:new Date(Date.now()-5*60*1000), work_start:'08:00', center_code:'C002'},
+        {id:3,name:'محمد حسن',  role:'monitor',   status:'break',   lat:33.3100, lng:44.3600, place_name:'مركز الأمل',   last_update:new Date(Date.now()-10*60*1000),work_start:'08:00', center_code:'C003'},
+        {id:4,name:'سارة أحمد', role:'supervisor',status:'task',    lat:33.3250, lng:44.3750, place_name:'مركز الوحدة', last_update:new Date(Date.now()-2*60*1000), work_start:'07:30', center_code:'C004'},
+        {id:5,name:'علي حسين',  role:'operator',  status:'offline', lat:33.3180, lng:44.3650, place_name:'مركز السلام', last_update:new Date(Date.now()-45*60*1000),work_start:'08:00', center_code:'C005'},
+        {id:6,name:'زينب محمود',role:'monitor',   status:'active',  lat:33.3300, lng:44.3800, place_name:'مركز التقدم', last_update:new Date(Date.now()-1*60*1000), work_start:'08:00', center_code:'C006'},
+      ];
+    }
+    renderActivity(users);
+    if(first) toast(demoMode?'تم تفعيل وضع الاختبار (بدون كسر الواجهة)':'تم الاتصال بالمصدر','success');
+  }
+
+  function renderActivity(users){
+    const statusOrder = {active:0, task:1, break:2, offline:3};
+    users.sort((a,b)=> (statusOrder[a.status]??9)-(statusOrder[b.status]??9));
+
+    const active = users.filter(u=>u.status==='active').length;
+    const brk    = users.filter(u=>u.status==='break').length;
+    const task   = users.filter(u=>u.status==='task').length;
+    const off    = users.filter(u=>u.status==='offline').length;
+
+    $('activeUsersCount').textContent = active;
+    $('breakUsersCount').textContent  = brk;
+    $('taskUsersCount').textContent   = task;
+    $('offlineUsersCount').textContent= off;
+
+    $('activityList').innerHTML = users.map(u=>{
+      const statusColors = {active:'bg-green-100 text-green-800', break:'bg-yellow-100 text-yellow-800', offline:'bg-red-100 text-red-800', task:'bg-blue-100 text-blue-800'};
+      const statusTexts  = {active:'نشط', break:'استراحة', offline:'غير متصل', task:'في مهمة'};
+      const roleTexts    = {monitor:'مراقب', operator:'مشغل', supervisor:'مشرف', admin:'مدير'};
+      const last = new Date(u.last_update||Date.now());
+      const diffMin = Math.max(0, Math.floor((Date.now() - last)/60000));
+      const timeText = diffMin<1?'الآن':`منذ ${diffMin} دقيقة`;
+
+      return `
+      <div class="bg-white border rounded-lg p-3 hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start mb-2">
+          <div>
+            <h5 class="font-medium text-gray-800">${u.name||'-'}</h5>
+            <p class="text-xs text-gray-500">${roleTexts[u.role]||u.role} - ${u.center_code||'-'}</p>
+          </div>
+          <span class="px-2 py-1 text-xs rounded-full ${statusColors[u.status]||'bg-gray-100 text-gray-800'}">${statusTexts[u.status]||u.status}</span>
+        </div>
+        <div class="flex justify-between items-center text-xs text-gray-600">
+          <span>📍 ${u.place_name||'غير معروف'}</span>
+          <span>🕒 ${timeText}</span>
+        </div>
+        <div class="mt-2 text-xs text-gray-500">بداية الدوام: ${u.work_start||'-'}</div>
+      </div>`;
+    }).join('');
+
+    // خريطة مبسطة (تحويل lat/lng إلى إحداثيات داخل صندوق)
+    const map = $('mapMarkers'); map.innerHTML='';
+    users.forEach(u=>{
+      const x = ((Number(u.lng)-44.35)*1000)+50;
+      const y = ((33.33-Number(u.lat))*1000)+50;
+      const clamp=(v,min,max)=>Math.max(min,Math.min(v,max));
+      const color = {active:'bg-green-500', break:'bg-yellow-500', offline:'bg-red-500', task:'bg-blue-500'}[u.status] || 'bg-gray-500';
+      const div = document.createElement('div');
+      div.className = `absolute w-4 h-4 ${color} rounded-full border-2 border-white shadow-lg transform -translate-x-1/2 -translate-y-1/2 cursor-pointer hover:scale-125 transition-transform`;
+      div.style.left = clamp(x,10,240)+'px';
+      div.style.top  = clamp(y,10,240)+'px';
+      div.title = `${u.name||''} — ${u.place_name||''}`;
+      map.appendChild(div);
+    });
+  }
+
+  // نصوص مساعدة
+  function typeText(t){ return ({equipment:'تقني', security:'أمني', procedural:'إجرائي', crowd:'ازدحام', other:'أخرى'})[t]||t; }
+  function centerStateText(s){ return ({active:'نشطة', paused:'متوقفة مؤقتاً', closed:'مغلقة'})[s]||s; }
+
+  // أزرار المراقب السريعة (رفع حادث مبسط)
+  document.addEventListener('click', async (e)=>{
+    const btn = e.target.closest('[data-quick]');
+    if(!btn) return;
+    const kind = btn.getAttribute('data-quick');
+    const mapSeverity = {critical:'critical', equipment:'high', crowd:'medium', note:'low'};
+    const mapType     = {critical:'security', equipment:'equipment', crowd:'crowd', note:'other'};
+    const title       = {critical:'حادث عاجل', equipment:'مشكلة تقنية', crowd:'ازدحام', note:'ملاحظة عامة'}[kind];
+
+    let lat=null,lng=null;
+    try{
+      await new Promise((res,rej)=>{
+        if(!navigator.geolocation) return res();
+        navigator.geolocation.getCurrentPosition(p=>{lat=+p.coords.latitude.toFixed(6); lng=+p.coords.longitude.toFixed(6); res();},()=>res(),{timeout:4000});
+      });
+    }catch{}
+
+    const payload = {
+      title, severity:mapSeverity[kind], type:mapType[kind],
+      center_code: localStorage.getItem('center_code')||'',
+      center_name: '', description: title, reported_by: currentUser?.name||'',
+      lat, lng
+    };
+    const resp = await api('create_incident', payload, 'POST');
+    if(resp && resp.ok){ toast('تم إرسال البلاغ بنجاح #'+resp.id,'success'); }
+    else { toast('تم حفظ البلاغ محليًا (وضع الاختبار)','success'); }
+  });
+
+  // بدء/إنهاء النوبة (يحفظ center_code محليًا إن لزم)
+  $('btnStartShift')?.addEventListener('click', async ()=>{
+    const centerCode = prompt('أدخل رمز المركز (اختياري):','');
+    if(centerCode) localStorage.setItem('center_code', centerCode);
+    toast('تم بدء النوبة','success'); startHeartbeat();
+  });
+  $('btnEndShift')?.addEventListener('click', ()=>{
+    localStorage.removeItem('center_code'); clearInterval(heartbeatTimer);
+    $('monCenter') && ( $('monCenter').textContent='-' );
+    toast('تم إنهاء النوبة','success');
+  });
+
+  // أزرار إدارية تجريبية
+  $('btnBackup')?.addEventListener('click', async ()=>{
+    const r = await api('backup', {}, 'POST');
+    toast(r?.ok?'تم إنشاء نسخة احتياطية':'تعذر تنفيذ النسخ — وضع الاختبار', r?.ok?'success':'error');
+  });
+  $('btnUsersReport')?.addEventListener('click', async ()=>{
+    const r = await api('users_report', {}, 'GET');
+    toast(r?.ok?'تم توليد تقرير المستخدمين':'تعذر التوليد — وضع الاختبار', r?.ok?'success':'error');
+  });
+  $('btnSupFullReport')?.addEventListener('click', async ()=>{
+    const r = await api('full_report', {}, 'GET');
+    toast(r?.ok?'تم إنشاء التقرير الشامل':'تعذر الإنشاء — وضع الاختبار', r?.ok?'success':'error');
+  });
+
+</script>
+
 </body>
 </html>
